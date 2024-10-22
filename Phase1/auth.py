@@ -8,7 +8,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(current_dir, 'users.db')
 
 # Database setup
-conn = sqlite3.connect(db_path)
+conn = sqlite3.connect(users.db)
 c = conn.cursor()
 
 # Create a user table if it doesn't exist

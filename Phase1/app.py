@@ -41,7 +41,7 @@ else:
             if user:
                 st.session_state.logged_in = True
                 st.session_state.user_id = user[0]  # Store user ID in session
-                st.success(f"Welcome back, {username}!")
+                st.success(f"Welcome back!")
             else:
                 st.error("Invalid username or password.")
 

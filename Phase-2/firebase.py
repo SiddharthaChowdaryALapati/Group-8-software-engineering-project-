@@ -2,9 +2,19 @@ import firebase_admin
 from firebase_admin import credentials, auth, firestore
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+import os
+
+# Dynamically construct the file path to the JSON file
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
+file_path = os.path.join(current_dir, "ht.json")  # Path to 'ht.json'
+
+# Verify the file exists before initializing Firebase
+if not os.path.exists(file_path):
+    raise FileNotFoundError(f"The file 'ht.json' was not found at {file_path}")
+
 
 # Initialize Firebase Admin SDK
-cred = credentials.Certificate("ht.json")  # Ensure the correct path to your credentials
+cred = credentials.Certificate(file_path)  # Ensure the correct path to your credentials
 firebase_admin.initialize_app(cred)
 
 # Get Firestore database reference

@@ -8,7 +8,7 @@ import os
 
 # Dynamically construct the file path to the JSON file
 current_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
-file_path = os.path.join(current_dir, "ht11.json")  # Path to 'ht.json'
+file_path = os.path.join(current_dir, "ht12.json")  # Path to 'ht.json'
 
 # Verify the file exists before initializing Firebase
 if not os.path.exists(file_path):

@@ -12,6 +12,15 @@ from dotenv import load_dotenv
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import os
+
+# Dynamically construct the file path to the JSON file
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
+file_path_pkl = os.path.join(current_dir, "hypertension_risk_model.pkl")  # Path to 'hypertension_risk_model.pkl'
+
+# Verify the file exists before initializing Firebase
+if not os.path.exists(file_path_pkl):
+    raise FileNotFoundError(f"The file 'hypertension_risk_model.pkl' was not found at {file_path_pkl}")
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -23,7 +32,7 @@ EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")  # Email address to send emails from
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Email password or app-specific password
 
 # Load the trained machine learning model
-model = joblib.load('hypertension_risk_model.pkl')
+model = joblib.load(file_path_pkl)
 
 # Sample data to simulate the doctors, categories, and bed availability
 doctors_data = [

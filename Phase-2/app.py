@@ -3,7 +3,7 @@ from firebase import signup_user, login_user, check_existing_data
 from data_collection import weekly_data
 import re
 from datetime import datetime
-from dummy_data3 import fetch_data_main
+# from dummy_data3 import fetch_data_main
 from dashboard import start_dashboard
 
 # Validate email format

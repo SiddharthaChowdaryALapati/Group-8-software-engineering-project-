@@ -3,6 +3,8 @@ from firebase_admin import credentials, auth, firestore
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import streamlit as st
+import requests
+import json
 
 import os
 
@@ -13,27 +15,31 @@ import os
 # # Verify the file exists before initializing Firebase
 # if not os.path.exists(file_path):
 #     raise FileNotFoundError(f"The file 'ht.json' was not found at {file_path}")
+presigned_url =" https://health-file.s3.us-east-2.amazonaws.com/ht04.json?response-content-disposition=inline&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEBIaCXVzLWVhc3QtMiJHMEUCIQC3S%2FAFKVgkFC34Sfic%2FvCnep%2BRGDDuIknTcJXkAczFRgIgKrHO4JgUGKMlKoBzkjn%2Fk8zncIwp0sI8pZGH%2Bga3mIkq1AMIu%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw1NDUwMDk4NTg3OTciDPuuHLdJzUF07rEnQCqoA%2FWAIVVmYy%2FcwxoC6SVWNFY0LsUkV3tgYDmf5IXXWtx9Nqvz%2Fs7kkoQ3MxNpo9lVr1Kplma3JHZEh1JTpnnTYohuh1y3L9oz9%2F5x7ahWWNhPQ%2FeWOwnAG042E1rlnyPOdPriAGBLAf3XLpVTEFUHwMDCnl4Hvmy%2B1UhnvnljjwyMliKfUxCU2Vg5FhhvAJ5Ny9GDi8At1n2Z9mNRtzHWQvxI3CZSWAsleylAyRkDUvgA83kd%2BKZeUwJTzl68YwGPi%2F%2Fsbosbx4oryyxMdlegcjoYCiK0lz6ZbYtbzZjMdda9b0xpg9mlk3EgytHqFX%2Bf8p5zauJqTBxzGP%2FkDjFTo6YtoY50zG9sVeJ73uFBrKa8drKIRr9gxXOl1I4%2BkbOlUjDmZNeRepufyQDVFJzF1JJSEtBCkvY2ACXYlLPtB9Wj44p9h%2Bi7xf%2F6Y%2F7mS%2FOZJJ0s46L61%2F8JnEW9p%2BT2JpnaOHIwtW0BbJMBzKeLgLrWnIR3U4qZTyegfysVHKFGmfSqzFs%2F6lVDphkvOS0Jn6Rt3ctbsmgJQ%2F7iuUxNyYlqFGtIlirNS3sw7%2Fq1ugY65AIozR%2Fp7sO04vrjZXtDEj3%2BOA0MukDkTkXI7G%2Fwf0Z96mIYo9oJ05%2BvJWjxYeuXjE3EAtYOzZC798aYVsZQcAgzegq%2FrSpu88b9JDEKxAuZTCeqPg9VRmBeoPWkBA54Sc2L5WeiwzOOqJ3z3dEODnth63BnqNZMOfqDcBZ1ERAYElLFa2tryJ1cUJVANJa9MV5smMfhxCkaRCcd%2BDQhCDpjam7gAg7TwAx2vK20y1OlCQpKQdIDQisCXVdzqRChtQ%2FJ27PFalMvmVHUSxHp7pJiluNpz%2F3jn%2FBDwI4wOXFPXIwd%2BMeRyMWjTEBhLNP71lfEyJImvTKu1Z7LiWwSuyilVy2O3dmdkn%2FclAo5vec%2F94Cx%2FP%2Fw7SqWuwlvHNJoUHxyr4yXZHxR73J4RX0Gbeg%2FKXw3J41QjZ4Jg8OhEC8Ih0EYI9CojYvZ4ZNZdJlNyXJYbt7vWZD976K20Xlo8YqKEM47Ng%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAX5ZI6PDWYRIYUHJ2%2F20241202%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Date=20241202T094339Z&X-Amz-Expires=43200&X-Amz-SignedHeaders=host&X-Amz-Signature=a4167e23ad6b5dd484fdb0e714bbeb6ac626ac34a4a37d010887f9b5d27ae18d"
+try:
+    # Fetch the JSON file
+    response = requests.get(presigned_url)
+    response.raise_for_status()  # Check for HTTP errors
 
-firebase_secrets = st.secrets["firebase"]
+    # Parse the JSON content
+    firebase_credentials = response.json()
+    if not firebase_admin._apps:
+        # Step 2: Pass the loaded JSON content to Firebase credentials
+        cred = credentials.Certificate(firebase_credentials)  # Dynamically loaded credentials
+        firebase_admin.initialize_app(cred, name='health')  # Initialize the Firebase app
 
-# Build the credentials dictionary
-firebase_credentials = {
-    "type": "service_account",
-    "project_id": firebase_secrets["project_id"],
-    "private_key_id": firebase_secrets["private_key_id"],
-    "private_key": firebase_secrets["private_key"],
-    "client_email": firebase_secrets["client_email"],
-    "client_id": firebase_secrets["client_id"],
-    "auth_uri": firebase_secrets["auth_uri"],
-    "token_uri": firebase_secrets["token_uri"],
-    "auth_provider_x509_cert_url": firebase_secrets["auth_provider_x509_cert_url"],
-    "client_x509_cert_url": firebase_secrets["client_x509_cert_url"]
-}
+    print("Firebase initialized successfully.")
+except requests.exceptions.RequestException as e:
+    print(f"Error fetching the JSON file: {e}")
+except json.JSONDecodeError as e:
+    print(f"Error parsing the JSON file: {e}")
+except firebase_admin.exceptions.FirebaseError as e:
+    print(f"Error initializing Firebase: {e}")
 
-if not firebase_admin._apps:
-    # Initialize Firebase Admin SDK
-    cred = credentials.Certificate(firebase_credentials)  # Ensure the correct path to your credentials
-    firebase_admin.initialize_app(cred, name='health')
+# if not firebase_admin._apps:
+#     # Initialize Firebase Admin SDK
+#     cred = credentials.Certificate(firebase_credentials)  # Ensure the correct path to your credentials
+#     firebase_admin.initialize_app(cred, name='health')
 
 # Get Firestore database reference
 db = firestore.client()

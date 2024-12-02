@@ -23,6 +23,8 @@ try:
 
     # Parse the JSON content
     firebase_credentials = response.json()
+
+    # Initialize Firebase only if it's not initialized yet
     if not firebase_admin._apps:
         # Step 2: Pass the loaded JSON content to Firebase credentials
         cred = credentials.Certificate(firebase_credentials)  # Dynamically loaded credentials

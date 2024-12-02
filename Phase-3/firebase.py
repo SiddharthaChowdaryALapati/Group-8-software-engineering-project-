@@ -2,20 +2,38 @@ import firebase_admin
 from firebase_admin import credentials, auth, firestore
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-
+import streamlit as st
 
 import os
 
-# Dynamically construct the file path to the JSON file
-current_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
-file_path = os.path.join(current_dir, "ht02.json")  # Path to 'ht.json'
+# # Dynamically construct the file path to the JSON file
+# current_dir = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
+# file_path = os.path.join(current_dir, "ht02.json")  # Path to 'ht.json'
 
-# Verify the file exists before initializing Firebase
-if not os.path.exists(file_path):
-    raise FileNotFoundError(f"The file 'ht.json' was not found at {file_path}")
+# # Verify the file exists before initializing Firebase
+# if not os.path.exists(file_path):
+#     raise FileNotFoundError(f"The file 'ht.json' was not found at {file_path}")
+
+firebase_secrets = st.secrets["firebase"]
+
+# Build the credentials dictionary
+firebase_credentials = {
+    "type": "service_account",
+    "project_id": firebase_secrets["project_id"],
+    "private_key_id": firebase_secrets["private_key_id"],
+    "private_key": firebase_secrets["private_key"],
+    "client_email": firebase_secrets["client_email"],
+    "client_id": firebase_secrets["client_id"],
+    "auth_uri": firebase_secrets["auth_uri"],
+    "token_uri": firebase_secrets["token_uri"],
+    "auth_provider_x509_cert_url": firebase_secrets["auth_provider_x509_cert_url"],
+    "client_x509_cert_url": firebase_secrets["client_x509_cert_url"]
+}
+
 
 # Initialize Firebase Admin SDK
-cred = credentials.Certificate(file_path)  # Ensure the correct path to your credentials
+cred = credentials.Certificate(firebase_credentials = {
+)  # Ensure the correct path to your credentials
 firebase_admin.initialize_app(cred)
 
 # Get Firestore database reference

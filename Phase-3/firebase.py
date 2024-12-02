@@ -27,6 +27,8 @@ try:
         # Step 2: Pass the loaded JSON content to Firebase credentials
         cred = credentials.Certificate(firebase_credentials)  # Dynamically loaded credentials
         firebase_admin.initialize_app(cred, name='health')  # Initialize the Firebase app
+        # Get Firestore database reference
+        db = firestore.client()
 
     print("Firebase initialized successfully.")
 except requests.exceptions.RequestException as e:
@@ -41,8 +43,7 @@ except firebase_admin.exceptions.FirebaseError as e:
 #     cred = credentials.Certificate(firebase_credentials)  # Ensure the correct path to your credentials
 #     firebase_admin.initialize_app(cred, name='health')
 
-# Get Firestore database reference
-db = firestore.client()
+
 
 
 def signup_user(email: str, password: str, username: str, age: int, gender: str, blood_type: str):

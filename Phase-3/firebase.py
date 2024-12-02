@@ -30,10 +30,10 @@ firebase_credentials = {
     "client_x509_cert_url": firebase_secrets["client_x509_cert_url"]
 }
 
-
-# Initialize Firebase Admin SDK
-cred = credentials.Certificate(firebase_credentials)  # Ensure the correct path to your credentials
-firebase_admin.initialize_app(cred, name='health')
+if not firebase_admin._apps:
+    # Initialize Firebase Admin SDK
+    cred = credentials.Certificate(firebase_credentials)  # Ensure the correct path to your credentials
+    firebase_admin.initialize_app(cred, name='health')
 
 # Get Firestore database reference
 db = firestore.client()
